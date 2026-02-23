@@ -1,39 +1,56 @@
-# Agentic RAG System
+# 🤖 Agentic RAG System - Actual Production ready not the tutorial slop.
+
+> ⚠️ **Please don't treat this like a `.gitignore`!** Every section has something cool, I promise.
 
 A production-grade **Retrieval-Augmented Generation** system built with **LangGraph**, featuring multi-tenant isolation, intelligent caching, rate limiting, generator-evaluator and human-in-the-loop workflows. Deployed on AWS with high availability architecture.
 
-**Live at:** [mlinterviewnotes.com](https://mlinterviewnotes.com)
+> *Because `ctrl+F` in a 50-page PDF isn't a personality trait.* 📄🔍
+
+**🌐 Test it Right here:** [mlinterviewnotes.com](https://mlinterviewnotes.com) 
+<br>
+**Quests to do:**
+- Click on the name of any pdf, Surprise awaiting - Atleast I felt like the explorer.
+- Select a source and ask an irrelevant question see what happens
+- Just ask a simpleton see how the LLM reacts 
+- Ask same question on different tenants - Will the same items be retireved ? Will you get a cached response ?
+
+
+
+**🎁 Even the users are created for you:** See `data/Users_and_Question_Bank.xlsx` for test credentials
 
 ---
 
-## Architecture Overview
+## 🏗️ Architecture Overview
 <p align="center">
   <img src="images/architecture.png" alt="Main Agent Graph" width="700"/>
 </p>
 
-<p align="center">
-  <img src="images/main_agent_graph.png" alt="Main Agent Graph" width="700"/>
-</p>
+
 
 The system implements a **ReAct (Reasoning + Acting)** pattern where the agent iteratively reasons about user queries and selects appropriate tools until the task is complete.
 
-### Key Components
+### 🧱 Key Components
 
 | Component | Technology | Purpose |
 |-----------|------------|---------|
-| **Agent Orchestration** | LangGraph | State machine for multi-step reasoning |
-| **Vector Store** | Qdrant Cloud | Semantic search with RBAC filtering |
-| **Database** | PostgreSQL (RDS) | Conversation persistence, checkpointing |
-| **Cache** | Redis (ElastiCache) | Semantic caching, rate limiting |
-| **LLM** | GPT-4o-mini | Reasoning and generation |
-| **Embeddings** | text-embedding-3-small | Document & query embeddings |
-| **Reranking** | Cohere Rerank | Result relevance optimization |
+| 🎯 **Agent Orchestration** | LangGraph | State machine for multi-step reasoning |
+| 🔍 **Vector Store** | Qdrant Cloud | Semantic search with RBAC filtering |
+| 🗄️ **Database** | PostgreSQL (RDS) | Conversation persistence, checkpointing |
+| ⚡ **Cache** | Redis (ElastiCache) | Semantic caching, rate limiting |
+| 🧠 **LLM** | GPT-4o-mini | Reasoning and generation |
+| 📐 **Embeddings** | text-embedding-3-small | Document & query embeddings |
+| 🎖️ **Reranking** | Cohere Rerank | Result relevance optimization |
 
 ---
 
-## Features
+## ✨ Features
 
-### 1. Multi-Agent Tool System
+### 1. 🛠️ Multi-Agent Tool System
+
+*"One agent to rule them all, seven tools to help it to achieve things."* 💍
+<p align="center">
+  <img src="images/main_agent_graph.png" alt="Main Agent Graph" width="700"/>
+</p>
 
 The agent has access to **7 specialized tools**, each designed for specific tasks:
 
@@ -53,11 +70,11 @@ The agent has access to **7 specialized tools**, each designed for specific task
 
 ---
 
-### 2. Sub-Graphs for Complex Workflows
+### 2. 🔄 Sub-Graphs for Complex Workflows
 
 Each complex tool is implemented as a **sub-graph** with its own state machine, enabling sophisticated multi-step workflows.
 
-#### Twitter Generation Sub-Graph
+#### 🐦 Twitter Generation Sub-Graph
 
 <table>
 <tr>
@@ -80,7 +97,7 @@ Each complex tool is implemented as a **sub-graph** with its own state machine, 
 </tr>
 </table>
 
-#### LinkedIn Post Sub-Graph
+#### 💼 LinkedIn Post Sub-Graph
 
 <table>
 <tr>
@@ -103,7 +120,7 @@ Each complex tool is implemented as a **sub-graph** with its own state machine, 
 </tr>
 </table>
 
-#### Document Embedder Sub-Graph
+#### 📄 Document Embedder Sub-Graph
 
 <table>
 <tr>
@@ -126,7 +143,9 @@ Each complex tool is implemented as a **sub-graph** with its own state machine, 
 
 ---
 
-### 3. Human-in-the-Loop (HITL)
+### 3. 👨‍💻 Human-in-the-Loop (HITL)
+
+*"Because even AI needs adult supervision sometimes."* 👀
 
 The system uses LangGraph's `interrupt()` to pause execution at critical decision points:
 
@@ -149,7 +168,7 @@ approval = interrupt({
 
 ---
 
-### 4. Semantic Caching (Tenant-Level)
+### 4. 🧠 Semantic Caching (Tenant-Level)
 
 The system implements intelligent caching that isolates data by tenant while using semantic similarity to serve cached responses for similar questions.
 
@@ -232,8 +251,9 @@ Each tenant has isolated cache storage. Queries are only matched against cache e
 
 ---
 
-### 5. Rate Limiting
+### 5. 🚦 Rate Limiting
 
+*"Yes, we handle the `429` so you don't have to rage-quit."* 😤
 
 <p align="center">
   <img src="images/token_rate_limit.png" alt="Token Rate Limit" width="700"/>
@@ -241,21 +261,20 @@ Each tenant has isolated cache storage. Queries are only matched against cache e
 
 **User Tier System:**
 
-| Tier | Requests/min | Tokens/min | Queue Priority |
-|------|--------------|------------|----------------|
-| `free` | 3 | 100 | Low |
-| `power` | 30 | 20,000 | Medium |
-| `super` | Unlimited | Unlimited | High |
-
+| Tier | Requests/min | Tokens/min |
+|------|--------------|------------|
+| `free` | 3 | 100 |
+| `power` | 30 | 20,000 |
+| `super` | Unlimited | Unlimited |
+> Feel free to create a free account and test the rate-limiting stuff out.
 **Implementation:**
-- **Sliding Window Algorithm** with Redis
-- **Global System Limit:** 400 requests/min
-- **Fail-Closed Strategy:** Denies requests if Redis unavailable
-- **Exponential Backoff:** 1s -> 2s -> 4s -> 8s -> 16s (capped at 30s)
+- 📊 **Sliding Window Algorithm** with Redis
+- 🌍 **Global System Limit:** 400 requests/min
+- ⏱️ **Exponential Backoff:** 1s → 2s → 4s → 8s → 16s (capped at 30s)
 
 ---
 
-### 6. Request Queuing
+### 6. 📬 Request Queuing
 
 When system is at capacity, requests enter a Redis-backed queue:
 
@@ -276,37 +295,30 @@ When system is at capacity, requests enter a Redis-backed queue:
 
 ---
 
-### 7. RBAC & Multi-Tenant Filtering
+### 7. 🔐 RBAC & Multi-Tenant Filtering
 
-**Visibility Rules for RAG Retrieval:**
+*"Your data is yours. Their data is theirs. We don't mix drinks."* 🍸
 
-```python
-def build_visibility_filter(tenant_id, department, user_id):
-    """
-    Users can see:
-    - Public docs in their tenant + department
-    - Their own private docs
-    """
-    return Filter(
-        should=[
-            # Public documents in same tenant/dept
-            Filter(must=[
-                FieldCondition(key="visibility", match="public"),
-                FieldCondition(key="tenant_id", match=tenant_id),
-                FieldCondition(key="department", match=department),
-            ]),
-            # User's own private documents
-            Filter(must=[
-                FieldCondition(key="visibility", match="private"),
-                FieldCondition(key="uploaded_by_user_id", match=user_id),
-            ]),
-        ]
-    )
+**How Multi-Tenancy Works:**
+
+- 🏢 **Tenant Isolation:** Each organization lives in its own bubble. No peeking at neighbors!
+- 🏬 **Department Filtering:** Physics folks see physics papers. HR sees... well, HR stuff.
+- 🔒 **Private Documents:** Upload something private? Only YOU can see it. Not even other users in your tenant.
+- 👀 **Public Documents:** Share with your tenant + department. Sharing is caring (within limits).
+
+**The Magic Formula:**
 ```
+Can I see this document? =
+  (Is it public? AND same tenant? AND same department?)
+  OR
+  (Is it private? AND did I upload it?)
+```
+
+*Plot twist: Even if you guess the document ID, the filter says "nice try" and shows you nothing.* 
 
 ---
 
-### 8. Memory & State Management
+### 8. 🧩 Memory & State Management
 
 **PostgreSQL Checkpointing:**
 - Conversation history persists across server restarts
@@ -332,7 +344,9 @@ current_department = contextvars.ContextVar("department")
 
 ---
 
-### 9. Observability with LangSmith
+### 9. 🔭 Observability with LangSmith
+
+*"Because `print('here')` debugging doesn't scale."* 🐛
 
 <table>
 <tr>
@@ -358,7 +372,7 @@ current_department = contextvars.ContextVar("department")
 
 ---
 
-## Deployment
+## ☁️ Deployment
 
 **AWS Services:**
 - **EC2:** Compute-optimized instances for parallel PDF processing
@@ -369,7 +383,7 @@ current_department = contextvars.ContextVar("department")
 
 ---
 
-## Tech Stack
+## 🧰 Tech Stack
 
 ```
 Backend:
@@ -396,60 +410,44 @@ Infrastructure:
 
 ---
 
-## API Endpoints
+## 🔌 API Endpoints
+> /v1/ I am kinda impressed with myslef, towards growth
 
+**🔐 Authentication**
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/chat/stream` | POST | SSE streaming chat with agent |
-| `/api/chat/stream-with-file` | POST | Chat with PDF upload |
-| `/api/chat/approve/{thread_id}` | POST | HITL approval endpoint |
-| `/api/chat/history/{thread_id}` | GET | Retrieve conversation |
-| `/api/documents/upload` | POST | Upload to knowledge base |
+| `/api/v1/auth/signup` | POST | Create new account |
+| `/api/v1/auth/signin` | POST | Login & get token |
+| `/api/v1/auth/me/{user_id}` | GET | Get user profile |
+
+**💬 Chat & Conversations**
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/chat/stream` | POST | SSE streaming chat with agent |
+| `/api/v1/chat/stream-with-file` | POST | Chat with PDF upload |
+| `/api/v1/chat/{thread_id}/approve` | POST | HITL approval endpoint |
+| `/api/v1/chat/{thread_id}/history` | GET | Retrieve conversation |
+| `/api/v1/chat/conversations` | GET | List all conversations |
+| `/api/v1/chat/conversations/{thread_id}` | DELETE | Delete a conversation |
+
+**📄 Document & Knowledge Base**
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/embed-house/upload` | POST | Upload document for embedding |
+| `/api/v1/embed-house/job/{job_id}` | GET | Check embedding job status |
+| `/api/v1/embed-house/knowledge-base/sources` | GET | List all uploaded documents |
+| `/api/v1/embed-house/knowledge-base/document/{id}` | DELETE | Remove document |
+
+**📊 Stats & Monitoring**
+| Endpoint | Method | Description |
+|----------|--------|-------------|
 | `/health` | GET | Service health check |
+| `/api/v1/chat/usage/stats` | GET | Rate limit usage stats |
+| `/api/v1/chat/cache/stats` | GET | Cache hit/miss stats |
 
 ---
 
-## Local Hosting
-
-### Prerequisites
-
-- Python 3.11+
-- Node.js 20+
-- PostgreSQL 16+
-- Redis 7+
-
-### Setup
-
-```bash
-# Clone and setup
-git clone https://github.com/alliedbrother/paper_explainer_agentic_rag.git
-cd paper_explainer_agentic_rag/final_app
-
-# Python environment
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-
-# Environment variables
-cp .env.example .env
-# Edit .env with your API keys
-
-# Start services (Docker)
-docker run -d --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=password postgres:16
-docker run -d --name redis -p 6379:6379 redis:7
-
-# Run backend
-uvicorn main:app --reload
-
-# Run frontend (new terminal)
-cd frontend && npm install && npm run dev
-```
-
-Open http://localhost:5173
-
----
-
-## Performance Characteristics
+## ⚡ Performance Characteristics
 
 | Metric | Value |
 |--------|-------|
@@ -459,3 +457,88 @@ Open http://localhost:5173
 | Cache Hit Ratio | ~40% (semantic matching) |
 | Avg Response Time | < 2s (cached) / 5-10s (RAG) |
 | Concurrent Users | ~50-100 per instance |
+
+---
+
+## 🚧 What's Missing (The Honest Section)
+
+*Because no project is perfect, and pretending otherwise is just bad comedy.* 🎭
+
+**❌ Things I Didn't Get To:**
+
+| Missing Feature | What It Would Do | Why It Matters |
+|-----------------|------------------|----------------|
+| 📊 **RAGAS Evals** | Evaluate RAG quality (faithfulness, relevance, context recall) | Can't improve what you can't measure |
+| 🔍 **Extraction Completeness Checks** | Verify PDF parsing didn't miss sections | Tables and images sometimes vanish into the void |
+| 🤖 **LLM Diversity** | Currently married to OpenAI | One API outage = entire system down. Not ideal. |
+
+**🔮 Future Additions (The Roadmap):**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    AFTER HITL APPROVAL                          │
+│                                                                 │
+│  User Approves Tweet/Post                                       │
+│         │                                                       │
+│         ▼                                                       │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐          │
+│  │  SQS/Kafka  │───▶│  Consumer   │───▶│  Twitter/   │          │
+│  │    Queue    │    │   Group     │    │  LinkedIn   │          │
+│  └─────────────┘    └─────────────┘    │    API      │          │
+│                                        └─────────────┘          │
+│                                                                 │
+│  Currently: Approval just returns "approved" ✅                 │
+│  Future: Actually posts to your social media 🚀                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                 AFTER ARXIV PAPER EMBEDDING                     │
+│                                                                 │
+│  Paper Embedded Successfully                                    │
+│         │                                                       │
+│         ▼                                                       │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐          │
+│  │   LLM Gen   │───▶│  5-Minute   │───▶│  Public     │          │
+│  │   Summary   │    │   Summary   │    │  Gallery    │          │
+│  └─────────────┘    └─────────────┘    └─────────────┘          │
+│                                                                 │
+│  Currently: Just embeds the paper 📄                            │
+│  Future: Auto-generates TL;DR for everyone to browse 📚         │
+│                                                                 │
+│  "Because nobody has time to read 40 pages just to find out     │
+│   if the paper is relevant to them." 😅                         │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**🐢 Why Is It a bit Slow?**
+
+> *I am using consumer-grade API tiers, not enterprise ones.*
+
+| What We Use | What Enterprises Use |
+|-------------|---------------------|
+| OpenAI standard tier | OpenAI with dedicated capacity |
+| Qdrant Cloud free/starter | Qdrant dedicated clusters |
+| Basic rate limits | Priority queues & higher limits |
+
+*Translation: We're driving a Honda, not a Ferrari. Gets you there, just not as fast.* 🚗
+
+---
+
+## 🎭 Behind the Scenes
+
+| Stat | Value |
+|------|-------|
+| ☕ Mass consumed | None |
+| 🌙 Lines written at 2 AM | *too many to count* |
+| 🔄 Times Redis will save us | *countless* |
+| 💬 "It works on my machine" | *I stopped counting* |
+| 🐛 Bugs fixed | *∞ - 1* |
+
+---
+
+<p align="center">
+  <b>If you read till here, my sleepless nights were worth it.</b> 😴❤️
+  <i>Built with positivity and love by <a href="https://github.com/alliedbrother">Sai Akhil </a>(I know cringe)</i>
+</p>
