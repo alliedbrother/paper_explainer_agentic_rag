@@ -1,4 +1,4 @@
-# 🤖 Agentic RAG System - Actual Production ready not the tutorial slop.
+# 🤖 Agentic RAG System - A Production System.
 
 > ⚠️ **Please don't treat this like a `.gitignore`!** Every section has something cool, I promise.
 
@@ -460,6 +460,131 @@ Infrastructure:
 
 ---
 
+## 💰 Cost Analysis
+
+*"Because 'it depends' isn't a budget."* 🧮
+
+### 🏗️ Infrastructure Costs (Fixed Monthly)
+
+| Component | Specification | Monthly Cost |
+|-----------|---------------|--------------|
+| 🖥️ **EC2** (2x c6i.2xlarge) | 8 vCPU, 16 GB RAM each | $490 |
+| 🐘 **RDS PostgreSQL** | db.r6g.large, Multi-AZ | $320 |
+| ⚡ **ElastiCache Redis** | cache.r6g.large + replica | $390 |
+| ⚖️ **ALB** | + LCU charges | $30 |
+| 🌐 **NAT Gateways** (2x) | + data processing | $70 |
+| 🛤️ **Route 53 + ACM** | Hosted zone + queries | $2 |
+| 📤 **Data Transfer** | ~50GB outbound | $5 |
+| 🔐 **Secrets Manager** | 5 secrets | $2 |
+| **Total Infrastructure** | | **$1,309/month** |
+
+> *With Reserved Instances (1-year): ~$850/month (35% savings)*
+
+---
+
+### 📊 Usage Pattern Per User
+
+| Metric | Value |
+|--------|-------|
+| 📨 Requests per hour | 25 |
+| ⏰ Active hours per day | 6 |
+| 📅 Active days per month | 22 (workdays) |
+| 📝 Average input tokens | 250 |
+| 📄 Average output tokens | 1,000 |
+| 📁 Document uploads per hour | 1 |
+| 📖 Average document size | 10 pages |
+| 🔍 RAG hits per hour | 15 |
+| ✅ Cache hit rate | 20% |
+
+---
+
+### 🔢 Token Calculations Per User Per Month
+
+```
+Monthly Active Hours = 6 hrs × 22 days = 132 hours
+Monthly Requests = 25 req/hr × 132 hrs = 3,300 requests
+Uncached Requests = 3,300 × 80% = 2,640 requests
+
+📥 Input Tokens (GPT-4o-mini)
+   2,640 requests × 250 tokens = 660,000 tokens
+   Cost: 660K × $0.00015/1K = $0.10
+
+📤 Output Tokens (GPT-4o-mini)
+   2,640 requests × 1,000 tokens = 2,640,000 tokens
+   Cost: 2.64M × $0.0006/1K = $1.58
+
+🔍 RAG Queries (Embeddings)
+   15 RAG/hr × 132 hrs × 80% uncached = 1,584 queries
+   Cost: 1,584 × 250 tokens × $0.00002/1K ≈ $0.01
+
+📄 Document Embeddings
+   1 doc/hr × 132 hrs = 132 documents
+   132 docs × 10 pages × 500 tokens = 660,000 tokens
+   Cost: 660K × $0.00002/1K = $0.01
+
+🎖️ Cohere Rerank
+   1,584 RAG queries × 1,000 tokens/query = 1.58M tokens
+   Cost: 1.58M × $1.00/1M = $1.58
+```
+
+| Cost Component | Monthly Cost | % of Total |
+|----------------|--------------|------------|
+| 📤 GPT-4o-mini Output | $1.58 | 48% |
+| 🎖️ Cohere Rerank | $1.58 | 48% |
+| 📥 GPT-4o-mini Input | $0.10 | 3% |
+| 📐 Embeddings | $0.02 | 1% |
+| **Total per User** | **$3.28/month** | |
+
+---
+
+### 📈 Extrapolation to Scale
+
+| Users | AI Cost/Month | Infrastructure | Total Monthly | Cost/User |
+|-------|---------------|----------------|---------------|-----------|
+| 100 | $328 | $1,309 | $1,637 | $16.37 |
+| 1,000 | $3,280 | $1,309 | $4,589 | $4.59 |
+| 5,000 | $16,400 | $2,618 | $19,018 | $3.80 |
+| 10,000 | $32,800 | $5,236 | $38,036 | $3.80 |
+| 50,000 | $164,000 | $13,090 | $177,090 | $3.54 |
+
+---
+
+### ⚠️ Capacity Analysis
+
+**TPM Bottleneck (200,000 TPM OpenAI Limit):**
+
+```
+Peak Concurrent Users (all in same minute):
+  200,000 TPM ÷ (1000 tokens/message * 2 messages/min/user) ≈ 100 concurrent users
+```
+
+| Bottleneck | Limit | Users Supported |
+|------------|-------|-----------------|
+| 🔢 OpenAI TPM | 200,000 | ~100 concurrent |
+| 🖥️ EC2 Compute | 2 instances | ~100-200 concurrent |
+| 🐘 RDS Connections | 100 per instance | ~200 concurrent |
+| ⚡ Redis Ops/sec | 100,000 | Not a bottleneck |
+
+**When System Breaks:** At ~1,000+ concurrent users without scaling:
+- OpenAI rate limits trigger → queuing kicks in → 429s for free tier
+- EC2 CPU maxes → PDF processing slows → longer wait times
+- Solution: Upgrade OpenAI tier + add EC2 instances + read replicas
+
+---
+
+### 📊 Complete Cost Table (Infra + AI)
+
+| Scale | Infrastructure | AI (OpenAI + Cohere) | Total | Per User |
+|-------|----------------|----------------------|-------|----------|
+| **100 users**  | $1,309 | $328 | **$1,637** | $16.37 |
+| **1K users**  | $1,309 | $3,280 | **$4,589** | $4.59 |
+| **10K users**  | $5,236 | $32,800 | **$38,036** | $3.80 |
+| **100,000** | $26,180 | $328,000 | **$354,180** | $3.54 |
+
+> *Economy of scale: Per-user cost drops from $16.37 → $3.54 as you grow!* 📉
+
+---
+
 ## 🚧 What's Missing (The Honest Section)
 
 *Because no project is perfect, and pretending otherwise is just bad comedy.* 🎭
@@ -471,6 +596,7 @@ Infrastructure:
 | 📊 **RAGAS Evals** | Evaluate RAG quality (faithfulness, relevance, context recall) | Can't improve what you can't measure |
 | 🔍 **Extraction Completeness Checks** | Verify PDF parsing didn't miss sections | Tables and images sometimes vanish into the void |
 | 🤖 **LLM Diversity** | Currently married to OpenAI | One API outage = entire system down. Not ideal. |
+| 🗑️ **Checkpoint Cleanup/TTL** | Auto-delete old LangGraph checkpoints | Storage grows unbounded - every invoke = new checkpoint row |
 
 **🔮 Future Additions (The Roadmap):**
 
