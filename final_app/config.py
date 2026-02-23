@@ -101,13 +101,19 @@ class Settings(BaseSettings):
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
 
+    # PostgreSQL SSL mode (for RDS)
+    postgres_ssl: str = ""  # Set to "require" for RDS
+
     @property
     def postgres_async_url(self) -> str:
         """Construct async PostgreSQL connection URL."""
-        return (
+        base_url = (
             f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
+        if self.postgres_ssl:
+            return f"{base_url}?ssl={self.postgres_ssl}"
+        return base_url
 
     # File upload limits
     max_file_size_mb: int = 50  # Maximum file size in MB
