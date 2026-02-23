@@ -1,0 +1,61 @@
+# systemd service for Agentic RAG Application
+# Location: /etc/systemd/system/ragapp.service
+#
+# Installation:
+#   sudo cp ragapp.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable ragapp
+#   sudo systemctl start ragapp
+
+[Unit]
+Description=Agentic RAG Application (FastAPI + Uvicorn)
+After=network.target postgresql.service redis.service
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=ragapp
+Group=ragapp
+WorkingDirectory=/opt/ragapp/app
+
+# Environment
+Environment="PATH=/opt/ragapp/venv/bin:/usr/local/bin:/usr/bin"
+EnvironmentFile=/opt/ragapp/.env
+
+# Application command
+# Using 4 workers for c6i.2xlarge (8 vCPU) - leaves headroom for nginx and system
+ExecStart=/opt/ragapp/venv/bin/uvicorn final_app.main:app \
+    --host 127.0.0.1 \
+    --port 8000 \
+    --workers 4 \
+    --loop uvloop \
+    --http httptools \
+    --no-access-log
+
+# Graceful shutdown
+ExecStop=/bin/kill -s TERM $MAINPID
+TimeoutStopSec=30
+KillMode=mixed
+KillSignal=SIGTERM
+
+# Restart policy
+Restart=always
+RestartSec=5
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/ragapp/app/data /opt/ragapp/logs
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Logging
+StandardOutput=append:/opt/ragapp/logs/uvicorn.log
+StandardError=append:/opt/ragapp/logs/uvicorn.log
+
+[Install]
+WantedBy=multi-user.target

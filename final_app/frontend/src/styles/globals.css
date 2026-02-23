@@ -1,0 +1,176 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Paste-inspired warm palette */
+    --background: 30 25% 98%;
+    --foreground: 240 10% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 10%;
+
+    /* Warm coral/peach primary */
+    --primary: 15 90% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Soft lavender secondary */
+    --secondary: 270 30% 94%;
+    --secondary-foreground: 270 30% 30%;
+
+    --muted: 30 20% 96%;
+    --muted-foreground: 240 5% 46%;
+
+    /* Soft sage accent */
+    --accent: 150 30% 90%;
+    --accent-foreground: 150 30% 25%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 30 15% 90%;
+    --input: 30 15% 90%;
+    --ring: 15 90% 65%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 240 10% 8%;
+    --foreground: 30 20% 98%;
+
+    --card: 240 10% 12%;
+    --card-foreground: 30 20% 98%;
+
+    --popover: 240 10% 12%;
+    --popover-foreground: 30 20% 98%;
+
+    --primary: 15 85% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 270 20% 20%;
+    --secondary-foreground: 270 20% 90%;
+
+    --muted: 240 10% 18%;
+    --muted-foreground: 240 5% 65%;
+
+    --accent: 150 20% 18%;
+    --accent-foreground: 150 20% 90%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 240 10% 20%;
+    --input: 240 10% 20%;
+    --ring: 15 85% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/30;
+  }
+}
+
+@layer components {
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary via-orange-400 to-amber-500 bg-clip-text text-transparent;
+  }
+
+  .glass-card {
+    @apply bg-white/80 dark:bg-card/80 backdrop-blur-xl border border-white/20 shadow-xl;
+  }
+
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+  }
+
+  .chat-bubble-user {
+    @apply bg-primary text-primary-foreground rounded-2xl rounded-br-md px-4 py-3;
+  }
+
+  .chat-bubble-assistant {
+    @apply bg-muted rounded-2xl rounded-bl-md px-4 py-3;
+  }
+}
+
+/* Animations */
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* Typography */
+.prose-chat {
+  @apply leading-relaxed;
+}
+
+.prose-chat p {
+  @apply mb-2 last:mb-0;
+}
+
+.prose-chat code {
+  @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono;
+}
+
+.prose-chat pre {
+  @apply bg-muted p-4 rounded-lg overflow-x-auto my-3;
+}
+
+.prose-chat ul, .prose-chat ol {
+  @apply ml-4 mb-2;
+}
+
+.prose-chat li {
+  @apply mb-1;
+}
+
+/* KaTeX Math Styling */
+.katex {
+  font-size: 1.05em;
+}
+
+.katex-display {
+  @apply my-3 overflow-x-auto py-2;
+}
+
+.katex-display > .katex {
+  @apply text-center;
+}
+
+/* Math blocks in dark mode */
+.dark .katex {
+  color: hsl(var(--foreground));
+}
+
+/* Better spacing for inline math */
+.katex-inline {
+  @apply mx-0.5;
+}
