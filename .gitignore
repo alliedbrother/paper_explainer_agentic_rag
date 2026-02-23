@@ -35,10 +35,6 @@ Thumbs.db
 *.log
 logs/
 
-# Data and uploads (keep structure, ignore contents)
-data/pdfs/*
-!data/pdfs/.gitkeep
-
 # Node.js
 node_modules/
 npm-debug.log*
