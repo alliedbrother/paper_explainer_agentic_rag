@@ -12,7 +12,7 @@ A production-grade **Retrieval-Augmented Generation** system built with **LangGr
 - Click on the name of any pdf, Surprise awaiting - Atleast I felt like the explorer.
 - Select a source and ask an irrelevant question see what happens
 - Just ask a simpleton see how the LLM reacts 
-- Ask same question on different tenants - Will the same items be retireved ? Will you get a cached response ?
+- Ask same question on different tenants - Will the same items be retrieved ? Will you get a cached response ?
 
 
 
@@ -668,3 +668,4 @@ Peak Concurrent Users (all in same minute):
   <b>If you read till here, my sleepless nights were worth it.</b> 😴❤️
   <i>Built with positivity and love by <a href="https://github.com/alliedbrother">Sai Akhil </a>(I know cringe)</i>
 </p>
+
